@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>组合分析 - Multi-Factor 文档</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "\u7ec4\u5408\u5206\u6790";
+    var mkdocs_page_input_path = "\u7ec4\u5408\u5206\u6790.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Multi-Factor 文档</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../_基础数据/"> 基础数据</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../因子处理/">因子处理</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../因子检测/">因子检测</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">组合分析</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#_1">风格暴露分析</a></li>
+    
+
+    <li class="toctree-l2"><a href="#_2">收益归因</a></li>
+    
+
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Multi-Factor 文档</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>组合分析</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="_1">风格暴露分析</h2>
+<p>可自行配置风格因子，这里仅以市值、反转等因子作为风格因子示例函数用法</p>
+<pre><code class="python">class style_analysis(object):
+    def __init__(self,styles = ['mkv','roc60','PE','PB','roe']):
+        self.styles = styles
+
+
+    def update_style(self):
+        ss = {}
+        for i in self.styles:
+            print(i) 
+            ss[i] = read_hdf5_base(i)
+            if i == 'mkv':
+                ss[i] = ss[i].applymap(lambda x:math.log(x,math.e))
+            ss[i] = median_clean(ss[i])
+        self.ss = ss
+
+    def cal_style_exposure(self,holdings):
+        s = {}
+        for i in sorted(holdings[0].keys()):
+            h = holdings[0][i]
+            style = [self.ss[n][i] for n in self.styles]
+            style = pd.DataFrame(style,index = self.styles).T
+            s[i] = style[style.index.isin(h)].mean()
+        return pd.DataFrame(s)
+</code></pre>
+
+<pre><code class="python">#加载风格因子数据，需要进行标准化，建议预储存标准化因子数据
+sp = mf.style_analysis()
+sp.update_style()
+
+
+ILLIQ = mf.read_hdf5_base('ILLIQ')
+r = mf.run(ILLIQ,period=10,fees=0.002,positions=100)
+exposure = sp.cal_style_exposure(r[1])
+</code></pre>
+
+<p><img alt="Screenshot" src="../img/ex.png" /></p>
+<p></br></p>
+<h2 id="_2">收益归因</h2>
+<p>...</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../因子检测/" class="btn btn-neutral" title="因子检测"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../因子检测/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>
