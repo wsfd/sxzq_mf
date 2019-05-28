@@ -82,6 +82,11 @@
           
             <li class="toctree-l1">
 		
+    <a class="" href="../常用函数/">常用函数</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
     <a class="" href="../组合分析/">组合分析</a>
 	    </li>
           
@@ -117,9 +122,10 @@
           <div role="main">
             <div class="section">
               
-                <p>这里为了数据的读写性能，我们主要以<a href="https://support.hdfgroup.org/HDF5/">HDF5</a>作为数据的基础存储格式，HDF5 拥有一系列的优异特性，使其特别适合进行大量科学数据的存储和操作，如它支持非常多的数据类型，灵活，通用，跨平台，可扩展，高效的 I/O 性能，支持几乎无限量（高达 EB）的单文件存储等。</p>
+                <p>数据主要包括<strong>行情数据</strong>、<strong>因子数据</strong>和部分<strong>常用数据</strong>，都已<code>hdf5</code>的格式进行保存，以<code>pandas.DataFrame</code>的格式进行处理。</p>
+<p><a href="https://support.hdfgroup.org/HDF5/">HDF5</a>作为数据的基础存储格式，HDF5 拥有一系列的优异特性，使其特别适合进行大量科学数据的存储和操作，如它支持非常多的数据类型，灵活，通用，跨平台，可扩展，高效的 I/O 性能，支持几乎无限量（高达 EB）的单文件存储等。</p>
 <h2 id="_1">个股行情数据</h2>
-<p>个股行情数据主要包括高开低收成交量等信息，价格为后复权价格，数据中包括了复权系数， Index 为交易日。</p>
+<p>个股行情数据主要包括<strong>高、开、低、收、成交量、成交金额、是否停牌等</strong>信息，价格为后复权价格，数据中包括了复权系数， Index 为交易日。</p>
 <pre><code class="python">   def fetch_stock_data(code,items='all',is_trade=True,cut = 60)
 </code></pre>
 
@@ -140,9 +146,11 @@
 <p><img alt="Screenshot" src="../img/stock.png" /></p>
 <p></br></p>
 <h2 id="_2">因子数据</h2>
-<p>因子数据横轴为交易日，纵轴为横轴数据起始日至到最后一日的所有历史上市交易个股证券代码，日期格式为<code>%Y-%m-%d</code>,证券代码为六位字符串。</p>
+<p>因子数据横轴为交易日，纵轴包括了数据起始日至到最后一日的所有历史上市交易个股证券代码，日期格式为<code>%Y-%m-%d</code>,证券代码为六位字符串。其中，个股未上市日期，停牌日期，退市日期的因子值为NaN值。</p>
+<p>一般建议保留因子原始数据，再另行保存标准化或者中性化之后的因子数据。</p>
 <p><strong size=4>读取：</strong></p>
-<pre><code class="python">   def read_hdf5_base(name,path='因子数据'):
+<pre><code class="python">   def read_hdf5_base(name,path='因子数据'): 
+   # 路径可以根据自己本地情况调整
 </code></pre>
 
 <p><strong size=4>保存：</strong></p>
@@ -164,6 +172,7 @@
 <p><img alt="Screenshot" src="../img/fs.png" /></p>
 <p></br></p>
 <h2 id="_3">基础数据</h2>
+<p>因子研究中常用的基础数据，包括全部历史股票代码，历史交易日，个股日收益率矩阵，股票停牌和ST信息等等，全局变量可以直接调用</p>
 <pre><code class="python">    mf.code_list #全部股票代码，list
     mf.index_dates #交易日，list
 
