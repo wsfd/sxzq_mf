@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>因子储存框架 - Multi-Factor 文档</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "\u56e0\u5b50\u50a8\u5b58\u6846\u67b6";
+    var mkdocs_page_input_path = "\u56e0\u5b50\u50a8\u5b58\u6846\u67b6.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Multi-Factor 文档</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../_基础数据/"> 基础数据</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">因子储存框架</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#_1">因子数据保存</a></li>
+    
+
+    <li class="toctree-l2"><a href="#_2">因子基础信息</a></li>
+    
+
+    <li class="toctree-l2"><a href="#_3">因子回测结果</a></li>
+    
+
+    <li class="toctree-l2"><a href="#_4">因子计算代码</a></li>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../因子处理/">因子处理</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../因子检测/">因子检测</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../常用函数/">常用函数</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../组合分析/">组合分析</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Multi-Factor 文档</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>因子储存框架</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>这里设计的因子数据格式，可以同时将结构化的因子矩阵和非结构化的如回测结果、回测参数、因子原代码、因子来源、因子类型、因子作者之类的数据，完整保存于同一文件内，方便同一调用、读取、重现；<br />
+并且能对多个因子的数据进行结构化的展示，方便读取观看并重现。</p>
+<h3 id="_1">因子数据保存</h3>
+<ul>
+<li>计算因子矩阵示例<br />
+  计算原始因子值，生成原始因子矩阵</li>
+</ul>
+<pre><code class="python">amount = mf.read_hdf5_base('amount_ftp')
+amount = amount.T.rolling(20).apply(np.mean).T
+</code></pre>
+
+<ul>
+<li>回测并生成回测数据   </li>
+</ul>
+<p>对因子回测并保留回测数据</p>
+<pre><code class="python">h = mf.run(amount,period=1,fees = 0)
+</code></pre>
+
+<pre><code>持仓周期： 1
+仓位数：   100
+回测部分：
+回测仓位数： 100
+回测手续费： 0
+交易模式： t日收盘价买入，收盘价卖出
+</code></pre>
+<p><img alt="png" src="/img/output_4_1.png" /></p>
+<p><img alt="png" src="/img/output_4_2.png" /></p>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>指数收益</th>
+      <th>超额收益</th>
+      <th>策略收益</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>夏普率</th>
+      <td>0.436</td>
+      <td>3.756</td>
+      <td>1.452</td>
+    </tr>
+    <tr>
+      <th>年化收益率</th>
+      <td>0.133</td>
+      <td>0.311</td>
+      <td>0.478</td>
+    </tr>
+    <tr>
+      <th>年化波动率</th>
+      <td>0.305</td>
+      <td>0.083</td>
+      <td>0.329</td>
+    </tr>
+    <tr>
+      <th>收益回撤比</th>
+      <td>0.117</td>
+      <td>1.194</td>
+      <td>0.628</td>
+    </tr>
+    <tr>
+      <th>最大回撤</th>
+      <td>-1.136</td>
+      <td>-0.261</td>
+      <td>-0.761</td>
+    </tr>
+    <tr>
+      <th>盈亏比</th>
+      <td>0.801</td>
+      <td>1.230</td>
+      <td>0.810</td>
+    </tr>
+    <tr>
+      <th>胜率</th>
+      <td>0.574</td>
+      <td>0.642</td>
+      <td>0.617</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<ul>
+<li>因子计算源代码 </li>
+</ul>
+<p>将因子计算代码字符化以备保存</p>
+<pre><code class="python">code = '''
+amount = mf.read_hdf5_base('amount_ftp')
+amount = amount.T.rolling(10).apply(np.mean).T'''
+</code></pre>
+
+<ul>
+<li>保存因子  </li>
+</ul>
+<p>最后对因子矩阵、回测结果、相关信息与参数进行保存。</p>
+<pre><code class="python">df = hdf5(amount,backtest=h[0],code = code)
+</code></pre>
+
+<pre><code class="python">df.save('amount_10',describes='成交金额十日均值',source='东方证券',types='技术面因子',author='yls')
+</code></pre>
+
+<pre><code>.//data//amount_10.hdf5
+&lt;HDF5 file "amount_10.hdf5" (mode r+)&gt; .//data//amount_10.hdf5
+ok &lt;HDF5 file "amount_10.hdf5" (mode r+)&gt;
+</code></pre>
+<div>
+  <th>  </th>
+  <th>  </th>
+  </br>
+</br>
+
+</div>
+
+<h3 id="_2">因子基础信息</h3>
+<ul>
+<li>读取因子值</li>
+</ul>
+<pre><code class="python">    '''读取数据'''
+    PB = mf.read_hdf5_base('PB')
+    PB.head()
+</code></pre>
+
+<p><img alt="Screenshot" src="../img/fs.png" />
+<div>
+</div>
+  <b> 
+  同时提取目录下多个因子的名称、描述、类型、来源和作者等信息。
+  </b></p>
+<pre><code class="python">names = ['amount_20','amount_10','adjust_ll','PB','roe']
+mfh5.fetch_base_infos(names)
+</code></pre>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>名称</th>
+      <th>简介</th>
+      <th>类型</th>
+      <th>来源</th>
+      <th>作者</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>amount_20</td>
+      <td>成交金额二十日均值</td>
+      <td>技术面因子</td>
+      <td>东方证券</td>
+      <td>yls</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>amount_10</td>
+      <td>成交金额十日均值</td>
+      <td>技术面因子</td>
+      <td>东方证券</td>
+      <td>yls</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>adjust_ll</td>
+      <td>流通市值调整流通换手</td>
+      <td>技术面因子</td>
+      <td>东方证券</td>
+      <td>ws</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>PB</td>
+      <td>市净率，wind数据计算</td>
+      <td>基本面因子</td>
+      <td></td>
+      <td>ws</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>roe</td>
+      <td>净资产收益率，ttm，wind数据计算</td>
+      <td>基本面因子</td>
+      <td></td>
+      <td>ws</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p></br>
+</br></p>
+<h3 id="_3">因子回测结果</h3>
+<p><b> 
+  同时提取目录下多个因子的回测绩效表现、因子收益率曲线和回测参数设置等信息。
+  </b></p>
+<ul>
+<li>绩效数据</li>
+</ul>
+<pre><code class="python">mfh5.fetch_performance(names)
+</code></pre>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>夏普率</th>
+      <th>年化收益率</th>
+      <th>年化波动率</th>
+      <th>收益回撤比</th>
+      <th>最大回撤</th>
+      <th>盈亏比</th>
+      <th>胜率</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>amount_20</th>
+      <td>4.335</td>
+      <td>0.362</td>
+      <td>0.083</td>
+      <td>1.484</td>
+      <td>-0.244</td>
+      <td>1.240</td>
+      <td>0.664</td>
+    </tr>
+    <tr>
+      <th>amount_10</th>
+      <td>3.756</td>
+      <td>0.311</td>
+      <td>0.083</td>
+      <td>1.194</td>
+      <td>-0.261</td>
+      <td>1.230</td>
+      <td>0.642</td>
+    </tr>
+    <tr>
+      <th>adjust_ll</th>
+      <td>2.322</td>
+      <td>0.163</td>
+      <td>0.070</td>
+      <td>0.697</td>
+      <td>-0.234</td>
+      <td>1.102</td>
+      <td>0.586</td>
+    </tr>
+    <tr>
+      <th>PB</th>
+      <td>0.458</td>
+      <td>0.051</td>
+      <td>0.111</td>
+      <td>0.146</td>
+      <td>-0.347</td>
+      <td>1.150</td>
+      <td>0.486</td>
+    </tr>
+    <tr>
+      <th>roe</th>
+      <td>-0.238</td>
+      <td>-0.019</td>
+      <td>0.078</td>
+      <td>-0.030</td>
+      <td>-0.617</td>
+      <td>1.146</td>
+      <td>0.455</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p></br>
+</br></p>
+<ul>
+<li>收益曲线</li>
+</ul>
+<pre><code class="python">rets = mfh5.fetch_return_series(names).dropna()
+rets.plot()
+plt.show()
+</code></pre>
+
+<p><img alt="png" src="/img/mfh5%E6%B5%8B%E8%AF%95_7_0.png" /></p>
+<p></br>
+</br></p>
+<ul>
+<li>回测参数</li>
+</ul>
+<pre><code class="python">mfh5.fetch_parames(names)
+</code></pre>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>成本</th>
+      <th>换仓周期</th>
+      <th>持股数</th>
+      <th>方向</th>
+      <th>基准</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>amount_20</th>
+      <td>0</td>
+      <td>1</td>
+      <td>100</td>
+      <td>True</td>
+      <td>all</td>
+    </tr>
+    <tr>
+      <th>amount_10</th>
+      <td>0</td>
+      <td>1</td>
+      <td>100</td>
+      <td>True</td>
+      <td>all</td>
+    </tr>
+    <tr>
+      <th>adjust_ll</th>
+      <td>0.002</td>
+      <td>10</td>
+      <td>100</td>
+      <td>True</td>
+      <td>all</td>
+    </tr>
+    <tr>
+      <th>PB</th>
+      <td>0.0</td>
+      <td>20</td>
+      <td>100</td>
+      <td>True</td>
+      <td>all</td>
+    </tr>
+    <tr>
+      <th>roe</th>
+      <td>0.0</td>
+      <td>20</td>
+      <td>100</td>
+      <td>True</td>
+      <td>all</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p></br>
+</br></p>
+<h3 id="_4">因子计算代码</h3>
+<p><b> 
+  打印因子计算函数。
+  </b></p>
+<pre><code class="python">code = mfh5.fetch_raw_code('amount_10')
+</code></pre>
+
+<pre><code>'''
+amount = mf.read_hdf5_base('amount_ftp')
+amount = amount.T.rolling(10).apply(np.mean).T
+'''
+</code></pre>
+<pre><code class="python">
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../因子处理/" class="btn btn-neutral float-right" title="因子处理">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../_基础数据/" class="btn btn-neutral" title=" 基础数据"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../_基础数据/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../因子处理/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>
